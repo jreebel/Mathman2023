@@ -8,7 +8,7 @@ SPRITE_SCALING_PLAYER = 0.5
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 SCREEN_TITLE = "Mathman 2023"
-PLAYER_MOVEMENT_SPEED = 1
+PLAYER_MOVEMENT_SPEED = 2
 
 
 # class QuitButton(arcade.gui.UIFlatButton):
@@ -93,6 +93,8 @@ class GameView(arcade.View):
 
         # Variables that will hold sprite lists
         self.player_list = None
+        self.wall_list = None
+        self.physics_engine = None
 
         # Set up the player info
         self.player_sprite = None
@@ -114,6 +116,7 @@ class GameView(arcade.View):
 
         # Sprite lists
         self.player_list = arcade.SpriteList()
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
 
         # Score
         self.score = 0
@@ -126,11 +129,38 @@ class GameView(arcade.View):
         self.player_sprite.center_y = SCREEN_HEIGHT / 2
         self.player_list.append(self.player_sprite)
 
+        # Set up the walls for the maze
+
+        # Set up the border walls
+        # left side
+        wall = arcade.Sprite("objects/vertical_wall.png")
+        wall.top = 899
+        wall.left = 0
+        self.wall_list.append(wall)
+        # right side
+        wall = arcade.Sprite("objects/vertical_wall.png")
+        wall.top = 899
+        wall.right = 1199
+        self.wall_list.append(wall)
+        # top
+        wall = arcade.Sprite("objects/horizontal_wall.png")
+        wall.top = 899
+        wall.right = 1199
+        self.wall_list.append(wall)
+        # bottom
+        wall = arcade.Sprite("objects/horizontal_wall.png")
+        wall.bottom = 35
+        wall.right = 1199
+        self.wall_list.append(wall)
+
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
+
     def on_draw(self):
         """ Draw everything """
         self.clear()
+        self.wall_list.draw()
         self.player_list.draw()
-        print(f'player x = {self.player_sprite.center_x} and y = {self.player_sprite.center_y}')
+        # print(f'player x = {self.player_sprite.center_x} and y = {self.player_sprite.center_y}')
         # Put the text on the screen.
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
@@ -139,9 +169,11 @@ class GameView(arcade.View):
         """ Movement and game logic """
         self.player_sprite.center_x += self.player_sprite.change_x
         self.player_sprite.center_y += self.player_sprite.change_y
+        self.physics_engine.update()
 
         # Call update on all sprites
         self.player_list.update()
+        self.wall_list.update()
 
         # Generate a list of all sprites that collided with the player.
 
