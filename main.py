@@ -91,9 +91,7 @@ class GameView(arcade.View):
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
 
-        # Variables that will hold sprite lists
-        self.player_list = None
-        self.wall_list = None
+        self.scene = None
         self.physics_engine = None
 
         # Set up the player info
@@ -114,20 +112,21 @@ class GameView(arcade.View):
         # Don't show the mouse cursor
         self.window.set_mouse_visible(False)
 
+        self.scene = arcade.Scene()
         # Sprite lists
-        self.player_list = arcade.SpriteList()
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
+        self.scene.add_sprite_list("Player")
+        self.scene.add_sprite_list("Walls", use_spatial_hash=True)
 
         # Score
         self.score = 0
 
         # Set up the player
         # Character image from kenney.nl
-        self.player_sprite = arcade.Sprite(":resources:images/animated_characters/female_person/femalePerson_idle.png",
-                                           SPRITE_SCALING_PLAYER)
+        image_source = ":resources:images/animated_characters/female_person/femalePerson_idle.png"
+        self.player_sprite = arcade.Sprite(image_source, SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = SCREEN_WIDTH / 2
         self.player_sprite.center_y = SCREEN_HEIGHT / 2
-        self.player_list.append(self.player_sprite)
+        self.scene.add_sprite("Player", self.player_sprite)
 
         # Set up the walls for the maze
 
@@ -136,30 +135,29 @@ class GameView(arcade.View):
         wall = arcade.Sprite("objects/vertical_wall.png")
         wall.top = 899
         wall.left = 0
-        self.wall_list.append(wall)
+        self.scene.add_sprite("Walls", wall)
         # right side
         wall = arcade.Sprite("objects/vertical_wall.png")
         wall.top = 899
         wall.right = 1199
-        self.wall_list.append(wall)
+        self.scene.add_sprite("Walls", wall)
         # top
         wall = arcade.Sprite("objects/horizontal_wall.png")
         wall.top = 899
         wall.right = 1199
-        self.wall_list.append(wall)
+        self.scene.add_sprite("Walls", wall)
         # bottom
         wall = arcade.Sprite("objects/horizontal_wall.png")
         wall.bottom = 35
         wall.right = 1199
-        self.wall_list.append(wall)
+        self.scene.add_sprite("Walls", wall)
 
-        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.scene.get_sprite_list("Walls"))
 
     def on_draw(self):
         """ Draw everything """
         self.clear()
-        self.wall_list.draw()
-        self.player_list.draw()
+        self.scene.draw()
         # print(f'player x = {self.player_sprite.center_x} and y = {self.player_sprite.center_y}')
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -170,10 +168,11 @@ class GameView(arcade.View):
         self.player_sprite.center_x += self.player_sprite.change_x
         self.player_sprite.center_y += self.player_sprite.change_y
         self.physics_engine.update()
+        self.scene.update()
 
         # Call update on all sprites
-        self.player_list.update()
-        self.wall_list.update()
+        # self.player_list.update()
+        # self.wall_list.update()
 
         # Generate a list of all sprites that collided with the player.
 
