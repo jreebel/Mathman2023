@@ -1,5 +1,6 @@
 import random
 import arcade
+import problem_sets_defined as psd
 from gui_styles import *
 
 # --- Constants ---
@@ -9,6 +10,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 SCREEN_TITLE = "Mathman 2023"
 PLAYER_MOVEMENT_SPEED = 2
+PROB_SET_ROW_SCALE = 50
 
 
 # class QuitButton(arcade.gui.UIFlatButton):
@@ -69,8 +71,11 @@ class InstructionView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Pick your practice set", self.window.width / 2, self.window.height / 2,
+        arcade.draw_text("Pick your practice set", self.window.width / 2,
+                         self.window.height - PROB_SET_ROW_SCALE,
                          arcade.color.WHITE, font_size=50, anchor_x="center")
+        for prob_set in psd.problem_sets:
+            print(prob_set['name'])
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         """ When the user presses a mouse button start the game """
@@ -169,10 +174,6 @@ class GameView(arcade.View):
         self.player_sprite.center_y += self.player_sprite.change_y
         self.physics_engine.update()
         self.scene.update()
-
-        # Call update on all sprites
-        # self.player_list.update()
-        # self.wall_list.update()
 
         # Generate a list of all sprites that collided with the player.
 
