@@ -13,27 +13,37 @@ PLAYER_MOVEMENT_SPEED = 2
 PROB_SET_ROW_SCALE = 50
 
 
-# class QuitButton(arcade.gui.UIFlatButton):
-#     def on_click(self, event: arcade.gui.UIOnClickEvent):
-#         arcade.exit()
-#
-#
-# class RestartButton(arcade.gui.UIFlatButton):
-#     def on_click(self, event: arcade.gui.UIOnClickEvent):
-#         pass
+class QuitButton(arcade.gui.UIFlatButton):
+    def on_click(self, event: arcade.gui.UIOnClickEvent):
+        arcade.exit()
+
+
+class RestartButton(arcade.gui.UIFlatButton):
+    def on_click(self, event: arcade.gui.UIOnClickEvent):
+        pass
+
+
+class ProbSetButton0(arcade.gui.UIFlatButton):
+    def on_click(self, event: arcade.gui.UIOnClickEvent):
+        psd.cur_problem_set = psd.problem_sets[0]
+
+
+class ProbSetButton1(arcade.gui.UIFlatButton):
+    def on_click(self, event: arcade.gui.UIOnClickEvent):
+        psd.cur_problem_set = psd.problem_sets[1]
 
 
 class GameOverView(arcade.View):
     def __init__(self):
         super().__init__()
 
-        # self.texture = arcade.load_texture("game_over.png")
-        # arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+        self.texture = arcade.load_texture("game_over.png")
+        arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
 
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
-        self.manager = arcade.gui.UIManager()
-        self.manager.enable()
+        # self.manager = arcade.gui.UIManager()
+        # self.manager.enable()
         # Create a vertical BoxGroup to align buttons
         # self.v_box = arcade.gui.UIBoxLayout()
         # quit_button = QuitButton(text="Quit", width=200, style=RED_STYLE)
@@ -54,7 +64,7 @@ class GameOverView(arcade.View):
         self.window.set_mouse_visible(True)
         self.texture.draw_sized(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
                                 SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.manager.draw()
+        # self.manager.draw()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         game_view = GameView()
@@ -63,6 +73,28 @@ class GameOverView(arcade.View):
 
 
 class InstructionView(arcade.View):
+
+    def __init__(self):
+        super().__init__()
+
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+        # Create a vertical BoxGroup to align buttons
+        self.v_box = arcade.gui.UIBoxLayout()
+
+        ps0 = ProbSetButton0(text=psd.problem_sets[0]['name'], width=200, style=RED_STYLE)
+        self.v_box.add(ps0)
+        ps1 = ProbSetButton1(text=psd.problem_sets[1]['name'], width=200, style=RED_STYLE)
+        self.v_box.add(ps1)
+
+        # Create a widget to hold the v_box widget, that will center the buttons
+        self.manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="center_x",
+                anchor_y="center_y",
+                child=self.v_box)
+        )
+
     def on_show_view(self):
         arcade.set_background_color(arcade.csscolor.DARK_SLATE_BLUE)
 
@@ -74,8 +106,7 @@ class InstructionView(arcade.View):
         arcade.draw_text("Pick your practice set", self.window.width / 2,
                          self.window.height - PROB_SET_ROW_SCALE,
                          arcade.color.WHITE, font_size=50, anchor_x="center")
-        for prob_set in psd.problem_sets:
-            print(prob_set['name'])
+        self.manager.draw()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         """ When the user presses a mouse button start the game """
@@ -113,7 +144,6 @@ class GameView(arcade.View):
 
     def setup(self):
         """ Set up the game and initialize the variables. """
-
         # Don't show the mouse cursor
         self.window.set_mouse_visible(False)
 
@@ -167,6 +197,7 @@ class GameView(arcade.View):
         # Put the text on the screen.
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
+
 
     def on_update(self, delta_time):
         """ Movement and game logic """
