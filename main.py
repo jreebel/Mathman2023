@@ -13,16 +13,16 @@ PLAYER_MOVEMENT_SPEED = 2
 PROB_SET_ROW_SCALE = 50
 
 
-class QuitButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        arcade.exit()
-
-
-class RestartButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        pass
-
-
+# class QuitButton(arcade.gui.UIFlatButton):
+#     def on_click(self, event: arcade.gui.UIOnClickEvent):
+#         arcade.exit()
+#
+#
+# class RestartButton(arcade.gui.UIFlatButton):
+#     def on_click(self, event: arcade.gui.UIOnClickEvent):
+#         pass
+#
+#
 class ProbSetButton0(arcade.gui.UIFlatButton):
     def on_click(self, event: arcade.gui.UIOnClickEvent):
         psd.cur_problem_set = psd.problem_sets[0]
@@ -141,6 +141,7 @@ class GameView(arcade.View):
         self.down_pressed = False
 
         arcade.set_background_color(arcade.color.AMAZON)
+        self.cps = psd.cur_problem_set
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -193,11 +194,16 @@ class GameView(arcade.View):
         """ Draw everything """
         self.clear()
         self.scene.draw()
-        # print(f'player x = {self.player_sprite.center_x} and y = {self.player_sprite.center_y}')
+        self.cps = psd.cur_problem_set
+
+        if self.cps is None:
+            pass
+        else:
+            print('set up the problem sprites, dummy!')
+
         # Put the text on the screen.
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
-
 
     def on_update(self, delta_time):
         """ Movement and game logic """
