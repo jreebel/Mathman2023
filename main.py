@@ -26,6 +26,7 @@ PROB_SET_ROW_SCALE = 50
 class ProbSetButton0(arcade.gui.UIFlatButton):
     def on_click(self, event: arcade.gui.UIOnClickEvent):
         psd.cur_problem_set = psd.problem_sets[0]
+        print("clicked me")
 
 
 class ProbSetButton1(arcade.gui.UIFlatButton):
@@ -76,7 +77,7 @@ class InstructionView(arcade.View):
 
     def __init__(self):
         super().__init__()
-
+        print('instruction view init')
         self.manager = arcade.gui.UIManager()
         self.manager.enable()
         # Create a vertical BoxGroup to align buttons
@@ -95,13 +96,17 @@ class InstructionView(arcade.View):
                 child=self.v_box)
         )
 
+        self.cur_problem_set = None
+
     def on_show_view(self):
+        print('instruction view show view')
         arcade.set_background_color(arcade.csscolor.DARK_SLATE_BLUE)
 
         # Reset the viewport if we have a scrolling game.
         arcade.set_viewport(0, self.window.width, 0, self.window.height)
 
     def on_draw(self):
+        print('instruction view draw')
         self.clear()
         arcade.draw_text("Pick your practice set", self.window.width / 2,
                          self.window.height - PROB_SET_ROW_SCALE,
@@ -110,6 +115,11 @@ class InstructionView(arcade.View):
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         """ When the user presses a mouse button start the game """
+        print('instruction view mouse press')
+        self.cur_problem_set = psd.cur_problem_set
+
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed."""
         game_view = GameView()
         game_view.setup()
         self.window.show_view(game_view)
@@ -120,6 +130,7 @@ class GameView(arcade.View):
 
     def __init__(self):
         """ Initializer """
+        print('game view init')
         # Call the parent class initializer
         super().__init__()
         # --- Required for all code that uses UI element,
@@ -147,6 +158,7 @@ class GameView(arcade.View):
         """ Set up the game and initialize the variables. """
         # Don't show the mouse cursor
         self.window.set_mouse_visible(False)
+        print('game view setup')
 
         self.scene = arcade.Scene()
         # Sprite lists
@@ -192,6 +204,7 @@ class GameView(arcade.View):
 
     def on_draw(self):
         """ Draw everything """
+        print('game view draw')
         self.clear()
         self.scene.draw()
         self.cps = psd.cur_problem_set
@@ -199,7 +212,7 @@ class GameView(arcade.View):
         if self.cps is None:
             pass
         else:
-            print('set up the problem sprites, dummy!')
+            pass # print('set up the problem sprites, dummy!')
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -207,6 +220,7 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
+        print('game view update')
         self.player_sprite.center_x += self.player_sprite.change_x
         self.player_sprite.center_y += self.player_sprite.change_y
         self.physics_engine.update()
@@ -225,6 +239,7 @@ class GameView(arcade.View):
         """
         Called when we change a key up/down
         """
+        print('game view keychange')
         # Process up/down
         if self.up_pressed and not self.down_pressed:
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
@@ -243,6 +258,7 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
+        print('game view keypress')
         if key == arcade.key.UP or key == arcade.key.W:
             self.up_pressed = True
         elif key == arcade.key.DOWN or key == arcade.key.S:
@@ -256,6 +272,7 @@ class GameView(arcade.View):
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
+        print('game view keyrelease')
 
         if key == arcade.key.UP or key == arcade.key.W:
             self.up_pressed = False
