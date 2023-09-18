@@ -5,6 +5,7 @@ from gui_styles import *
 
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
+SPRITE_SCALING_PROBLEM = 0.5
 
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
@@ -162,7 +163,7 @@ class GameView(arcade.View):
         self.scene = arcade.Scene()
         # Sprite lists
         self.scene.add_sprite_list("Player")
-        self.scene.add_sprite_list("Problems")
+        self.problem_sprite_list = arcade.SpriteList()
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
 
         # Score
@@ -199,12 +200,18 @@ class GameView(arcade.View):
         self.scene.add_sprite("Walls", wall)
 
         # Set up the problem sprites
-        problem_1 = arcade.Sprite('objects/1plus1.png', center_x=640, center_y=640)
-        self.scene.add_sprite("Problems", problem_1)
-        problem_2 = arcade.Sprite('objects/2plus1.png', center_x=100, center_y=100)
-        self.scene.add_sprite("Problems", problem_2)
-        problem_3 = arcade.Sprite('objects/2plus2.png', center_x=300, center_y=300)
-        self.scene.add_sprite("Problems", problem_3)
+        i = 0
+        cnt = len(psd.cur_problem_set['answers'])
+
+        while i < cnt:
+            problem = arcade.Sprite(psd.cur_problem_set['file_name'][i],
+                                    center_x=psd.cur_problem_set['xcoords'][i],
+                                    center_y=psd.cur_problem_set['ycoords'][i],
+                                    scale=SPRITE_SCALING_PROBLEM)
+            problem.ix = i
+            problem.answer = psd.cur_problem_set['answers'][i]
+            self.problem_sprite_list.append(problem)
+            i = i + 1
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.scene.get_sprite_list("Walls"))
 
@@ -212,6 +219,8 @@ class GameView(arcade.View):
         """ Draw everything """
         self.clear()
         self.scene.draw()
+        self.problem_sprite_list.draw()
+
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -225,6 +234,10 @@ class GameView(arcade.View):
         self.scene.update()
 
         # Generate a list of all sprites that collided with the player.
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                        self.problem_sprite_list)
+        for hit in hit_list:
+            print(hit.ix)
 
         # Loop through each colliding sprite, remove it, and add to the score.
 
